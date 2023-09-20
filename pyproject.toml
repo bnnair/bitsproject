@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "visioncare"
+version = "0.1"
+description = "care for the elderly by use of computer vision. App to keep an eye on the elderly to provide instant help when needed the most."
+authors = ["Biju Nair <bnnair@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+boto3 = "^1.28.49"
+flask = "^2.3.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

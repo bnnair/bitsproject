@@ -1,0 +1,9 @@
+{
+  "region": "ap-south-1",
+  "kinesisFirehoseName": "bitsprojectfirehose",
+  "s3BucketNameRawData": "bitsprojects3rawdatastore",
+  "s3BucketNameInferData":"bitsprojects3inferdatastore",
+  "firehoseLambdaName": "firehoseToLambdaFunc",
+  "folder_path":"static/videos/",
+  "frame_path":"static/frames/"
+}
