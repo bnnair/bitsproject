@@ -6,23 +6,29 @@
 </head>
 
 <body>
-    <h1>Continuous Video Playback</h1>
+    <div class ="row">
+        <div class="column">
+            <h2>Raw Video Playback from webcam</h2>
+            <div id="video-container0">
+                {% if source_type == 'video' %}
+                    <video id="video-player" width="640" height="360" controls autoplay>
+                        <source src="{{ url_for('static', filename='videos/' + video_files[0]) }}" type="video/mp4">
+                    </video>
+                {% else %}
+                    <img src="{{ url_for('webcam') }}" width="640" height="360"/>
+                {% endif %}
+            </div>
+            <div id="button-container">
+                <h3>upload a video</h3>
+                <form method="POST" action="/upload" enctype="multipart/form-data">
+                    <input type="file" name="video" accept="video/*">
+                    <input type="submit" value="Upload">
+                </form>
+            </div>
+        </div>
+    </div>  
 
-    <div id="video-container">
-        {% if source_type == 'video' %}
-            <video id="video-player" width="640" height="360" controls autoplay>
-                <source src="{{ url_for('static', filename='videos/' + video_files[0]) }}" type="video/mp4">
-            </video>
-        {% else %}
-            <img src="{{ url_for('webcam') }}" width="640" height="360"/>
-        {% endif %}
-    </div>
-    
-    <h2>Upload a Video</h2>
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/*">
-        <input type="submit" value="Upload">
-    </form>
+
     {% if source_type == 'video' %}
         <script>
             const videoPlayer = document.getElementById('video-player');

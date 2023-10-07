@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Continuous Video Playback</title>
+</head>
+
+<body>
+    <div>
+        <h2>Raw Video Playback from webcam</h2>
+        <div id="video-container">
+            {% if source_type == 'video' %}
+                <video id="video-player" width="640" height="360" controls autoplay>
+                    <source src="{{ url_for('static', filename='videos/' + video_files[0]) }}" type="video/mp4">
+                </video>
+            {% else %}
+                <img src="{{ url_for('webcam') }}" width="640" height="360"/>
+            {% endif %}
+        </div>
+        <div id="button-container">
+            <h3>upload a video</h3>
+            <form method="POST" action="/upload" enctype="multipart/form-data">
+                <input type="file" name="video" accept="video/*">
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+    </div>  
+
+
+    {% if source_type == 'video' %}
+        <script>
+            const videoPlayer = document.getElementById('video-player');
+            const videoContainer = document.getElementById('video-container');
+            const videoFiles = { video_files}
+
+            let currentIndex = 0;
+
+            videoPlayer.addEventListener('ended', () => {
+                currentIndex = (currentIndex + 1) % videoFiles.length;
+                const nextVideo = videoFiles[currentIndex];
+                videoPlayer.src = "{{ url_for('static', filename='videos/') }}" + nextVideo;
+                videoPlayer.load();
+                videoPlayer.play();
+            });
+        </script>
+    {% endif %}
+</body>
+
+</html>

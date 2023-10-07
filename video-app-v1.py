@@ -66,4 +66,5 @@ def send_video_to_firehose(videofiles):
             print(f"Failed to upload {video_file} to Kinesis Firehose: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0",port=5000)
+    # app.run(debug=True)

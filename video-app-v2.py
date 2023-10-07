@@ -4,6 +4,7 @@ import boto3
 from boto3 import Session
 import cv2
 import json
+from decouple import config
 
 app = Flask(__name__)
 
@@ -21,15 +22,15 @@ video_folder = configJson["folder_path"]
 frame_folder = configJson["frame_path"]
 
 session = Session()
-credentials = session.get_credentials()
-curr_cred = credentials.get_frozen_credentials()
+# credentials = session.get_credentials()
+# curr_cred = credentials.get_frozen_credentials()
 
 # Initialize the AWS Firehose client
 client = boto3.client(
     'firehose',
     region_name=aws_region,
-    aws_access_key_id=curr_cred.access_key,
-    aws_secret_access_key=curr_cred.secret_key
+    aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY")
 )
 
 def send_to_firehose(frame):
@@ -39,12 +40,12 @@ def send_to_firehose(frame):
 
         try:
             # Send the frame to the Firehose delivery stream
-            # response = client.put_record(
-            #     DeliveryStreamName=firehose_delivery_stream,
-            #     Record={
-            #         'Data': frame_bytes
-            #     }
-            # )
+            response = client.put_record(
+                DeliveryStreamName=firehose_delivery_stream,
+                Record={
+                    'Data': frame_bytes
+                }
+            )
             print("Frame sent to Firehose successfully")
         except Exception as e:
             print(f"Error sending frame to Firehose: {str(e)}")
@@ -61,26 +62,23 @@ def generate():
     while True:
         ret, frame = cap.read()
         ret, jpeg = cv2.imencode('.jpg', frame)
-        dim = (640, 360)
-  
-        # resize image
-        frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
-        # send_to_firehose(frame)
+        
+        send_to_firehose(frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
 
 @app.route('/webcam')
 def webcam():
+    
         return Response(generate(),
                 mimetype='multipart/x-mixed-replace; boundary=frame')
-        # return render_template('index.html', source_type='frame', frame_filenames=frame_filenames)
 
 
 @app.route('/folder')
 def folder():
     # Get a list of video files in the folder
     video_files = [file for file in os.listdir(video_folder)]
-    send_video_to_firehose(video_files)
+    # send_video_to_firehose(video_files)
     return render_template('index.html',source_type='video', video_files=video_files)
 
 @app.route('/upload', methods=['POST'])
@@ -117,4 +115,5 @@ def send_video_to_firehose(videofiles):
             print(f"Failed to upload {video_file} to Kinesis Firehose: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0",port=5000)
+    # app.run(debug=True)
