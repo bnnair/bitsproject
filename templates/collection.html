@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Continuous Video Rendering</title>
+</head>
+
+<body>
+    <video id="video" controls preload="auto" width="640" height="360"></video>
+
+    <script>
+        // Create a video element
+        const video = document.querySelector('#video');
+
+        // Get the list of videos from the Flask app
+        const videos = "{{videos}}";
+
+        // Start a generator to iterate over the videos
+        const videoGenerator = (function* () {
+            console.log(videos)
+            for (const video of videos) {
+                console.log(video)
+                yield video;
+            }
+        })();
+
+        // Render the first video
+        nextVideo();
+
+        // Render the next video
+        async function nextVideo() {
+            const video = await videoGenerator.next();
+
+            // If the end of the sequence has been reached, start over
+            if (video.done) {
+                videoGenerator = (function* () {
+                    for (const video of videos) {
+                        yield video;
+                    }
+                })();
+                return;
+            }
+
+            // Get the video data from S3
+            const videoData = await fetch(`/videos/${video.value}`).then(response => response.arrayBuffer());
+
+            // Create a new Blob object from the video data
+            const videoBlob = new Blob([videoData], { type: 'video/mp4' });
+
+            // Set the video element's source to the Blob object
+            video.srcObject = videoBlob;
+
+            // Play the video
+            video.play();
+        }
+
+    </script>
+</body>
+
+</html>

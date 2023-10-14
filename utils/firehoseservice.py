@@ -5,15 +5,27 @@ import sys
 import json
 from decouple import config
 from botocore import exceptions, errorfactory
+from firehoseiamservice import firhoseIamService
+
 
 
 class FirehoseStream:
-    def __init__(self) -> None:
+    def __init__(self):
         with open('config.json') as json_data_file:
             configJson = json.load(json_data_file)
 
         self.awsRegion = configJson['region']
         self.kinesisFirehoseName = configJson['kinesisFirehoseName']
+        self.s3RawData = configJson['s3RawData']
+        ## Create the iam role for firehose
+        firehoseiamObj = firhoseIamService()
+        succeed = firehoseiamObj.createfirehoseroleinIAM()
+        self.roleArn =""
+        if succeed:
+            self.roleArn = firehoseiamObj.getRoleArn()
+        else:
+            return "Error creating role in IAM for Firehose."
+        
         session = boto3.Session()
         self.kinesis_client = session.client('firehose', 
                                             aws_access_key_id=config("AWS_ACCESS_KEY_ID"), 
@@ -27,8 +39,8 @@ class FirehoseStream:
                 DeliveryStreamName=self.kinesisFirehoseName,
                 DeliveryStreamType='DirectPut',
                 S3DestinationConfiguration={
-                    'RoleARN': "arn:aws:iam::521205806592:role/firehosedeliveryrole",
-                    'BucketARN': 'arn:aws:s3:::bitsprojects3rawdatastore',
+                    'RoleARN': self.roleArn,
+                    'BucketARN': 'arn:aws:s3:::'+ self.s3RawData,
                     'CloudWatchLoggingOptions': {
                         'Enabled': True,
                         'LogGroupName': 'kinesisfirehosedeliveryloggroup',
@@ -58,6 +70,7 @@ if __name__ == '__main__':
 
     firehoseObj = FirehoseStream()
     response=firehoseObj.createFirehoseStream()
+    # response=firehoseObj.deleteVideoStream()
     print(response)
 
 

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+python3 --version
+pip3 --version
+##create the access mount directory
+sudo mkdir -p /mnt/access
+sudo chmod -R 777 /mnt/access
+
+export PATH="$PATH:/home/ubuntu/.local/bin"
+echo $PATH
+
+##Install the dependencies
+pip3 install --upgrade --target /mnt/access/ torch torchvision --no-cache-dir
+##pip3 install --upgrade --target /mnt/access/ torch torchvision --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install --upgrade --target /mnt/access/ git+https://github.com/huggingface/transformers accelerate decord --no-cache-dir
+##pip install --upgrade --target /mnt/access/ accelerate decord --no-cache-dir
+
+##Create models directory for storing the inference models
+sudo mkdir -p /mnt/access/models/vit_fire_model
+sudo mkdir -p /mnt/access/models/vit_fall_model
+
+sudo chown -R ubuntu /mnt/access/models
+sudo chgrp -R ubuntu /mnt/access/models
+

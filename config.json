@@ -1,9 +1,33 @@
 {
   "region": "ap-south-1",
   "kinesisFirehoseName": "bitsprojectfirehose",
-  "s3BucketNameRawData": "bitsprojects3rawdatastore",
-  "s3BucketNameInferData":"bitsprojects3inferdatastore",
-  "firehoseLambdaName": "firehoseToLambdaFunc",
-  "folder_path":"static/videos/",
-  "frame_path":"static/frames/"
+  "firehoserolename": "firehosedeliveryrole",
+  "firehosepolicies": ["AmazonS3FullAccess", "CloudWatchLogsFullAccess"],
+  "s3RawData": "bitsrawdatastore1",
+  "s3VideoData": "bitsvideodatastore",
+  "s3InferData": "bitsinferdatastore",
+  "efsName": "bitsEFS",
+  "ec2Name": "bitsEC2Instance",
+  "securitygroup": "",
+  "efs_secgroup": "",
+  "ami_image_id": "ami-0f5ee92e2d63afc18",
+  "instance_type": "t2.micro",
+  "disk_size_gb": 16,
+  "device_name": "/dev/sda1",
+  "keyname": "bits-key",
+  "subnet_id1": "subnet-0b4f8e76da1c85f44",
+  "subnet_id2": "subnet-0ea41fd417bc575f3",
+  "firehoseLambda": "firehoseToLambdaFunc1",
+  "modelExecLambda": "modelExecLambdaFunc",
+  "folder_path": "static/videos/",
+  "frame_path": "static/frames/",
+  "raws3triggerrole": "raws3triggerrole",
+  "s3triggerpolicies": [
+    "AmazonElasticFileSystemClientFullAccess",
+    "service-role/AmazonS3ObjectLambdaExecutionRolePolicy",
+    "service-role/AWSLambdaBasicExecutionRole",
+    "AWSLambdaExecute",
+    "service-role/AWSLambdaVPCAccessExecutionRole"
+  ],
+  "videos3triggerrole": "videos3triggerrole"
 }

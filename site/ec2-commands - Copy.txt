@@ -1,0 +1,47 @@
+ls
+sudo apt update
+sudo apt upgrade
+python --version
+python3 --version
+pip --version
+pip3 --version
+sudo apt install python3-pip
+pip --version
+pip3 --version
+sudo apt install nfs-common
+
+
+sudo mkdir -p /mnt/access
+sudo chmod -R 777 /mnt/access
+
+
+nano /etc/environment
+##add the following to the environment
+"/home/ubuntu/.local/bin"
+
+source /etc/environment 
+
+pip3 install --upgrade --target /mnt/access/ torch --no-cache-dir
+pip3 install --upgrade --target /mnt/access/ torch torchvision --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install --upgrade --target /mnt/access/ git+https://github.com/huggingface/transformers --no-cache-dir
+pip install --upgrade --target /mnt/access/ accelerate decord --no-cache-dir
+
+cd /mnt/access
+sudo mkdir models
+
+sudo mkdir vit_fire_model
+sudo mkdir vit_fall_model
+
+sudo chmod -R 777 models
+sudo chown ubuntu models
+sudo chgrp ubuntu models
+ls -al
+cd models
+ls -al
+sudo chown -R ubuntu vit_fire_model/
+sudo chgrp -R ubuntu vit_fire_model/
+
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-07b8576a25dbbb413.efs.ap-south-1.amazonaws.com:/ /mnt
+
+
+fs-07b8576a25dbbb413.efs.ap-south-1.amazonaws.com:/ /mnt nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0

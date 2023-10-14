@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Video Player</title>
+    <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="video-container">
+        <video id="video-player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
+        </video>
+    </div>
+
+
+    <script src="https://vjs.zencdn.net/7.15.4/video.js"></script>
+    <script>
+
+        var player = videojs('video-player');
+        console.log(player)
+        // Event listener for receiving SSE updates
+        var eventSource = new EventSource("/events");
+        console.log(eventSource)
+
+        // eventSource.onopen = function (event) {
+        //     // Code to handle SSE connection opened (optional)
+        //     console.log("inside the on open")
+        // };
+        
+        // eventSource.onmessage = function (event) {
+        //     console.log("event=====>", event)
+        //     console.log("inside the onmessage ")
+        //     var data = JSON.parse(event.data);
+        //     var videoUrls = data.video_urls;
+        //     console.log(videoUrls)
+        //     // Clear previous sources
+        //     player.reset();
+
+        //     // Add new video sources
+        //     videoUrls.forEach(function (url) {
+        //         player.src({
+        //             src: url,
+        //             type: 'video/mp4'
+        //         });
+        //     });
+        //     console.log("outside the on message")
+        //     // Automatically start playing
+        //     player.play();
+        // };
+
+        // eventSource.onerror = function (error) {
+        //     console.error("SSE Error:", error);
+        // };      
+
+
+        eventSource.addEventListener('open', function (e) {
+            console.log("Opened!");
+        }, false);
+
+        eventSource.addEventListener('error', function (e) {
+            console.log("Errored!", e);
+        }, false);
+
+        eventSource.addEventListener('message', function (e) {
+            var parsedData = JSON.parse(e.data);
+            console.log(parsedData)
+        },false);
+
+
+</script>
+</body>
+
+</html>

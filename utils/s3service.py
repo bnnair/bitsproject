@@ -11,26 +11,23 @@ class S3Service:
             configJson = json.load(json_data_file)
 
         self.s3Region = configJson['region']
-        self.s3BucketNameRawData = configJson['s3BucketNameRawData']
-        print("s3BucketNameRawData=:",self.s3BucketNameRawData)
-        
-        self.s3BucketNameInferData = configJson['s3BucketNameInferData']
-        print("s3BucketNameInferData=:",self.s3BucketNameInferData)
-        
+        self.s3RawData = configJson['s3RawData']
+        self.s3VideoData = configJson['s3VideoData']
+        self.s3InferData = configJson['s3InferData']
         
         session = boto3.Session()
         self.s3Client = session.client('s3',
                                        aws_access_key_id=config("AWS_ACCESS_KEY_ID"), 
                                        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"), 
                                        region_name=self.s3Region)         
-         
-         
-         
+
     def createS3Bucket(self, flag):
         if flag=="Raw":
-            bucketName = self.s3BucketNameRawData
+            bucketName = self.s3RawData
+        elif flag =="Infer":
+            bucketName=self.s3InferData
         else:
-            bucketName=self.s3BucketNameInferData
+            bucketName=self.s3VideoData
             
         print(bucketName)                
         print("Location:", self.s3Region )
@@ -48,14 +45,12 @@ class S3Service:
                                 'RestrictPublicBuckets': True
                             },
                         )
-            # print(access_public)
-            print(bucketName,"==:",response)
+            print(bucketName,"==:",access_public)
         except botocore.exceptions.ClientError as error:
             print("Error occured while creating s3 bucket:{}".format(error))
             raise error
         except botocore.exceptions.ParamValidationError as error:
             raise ValueError('The parameters you provided are incorrect: {}'.format(error))
-            
             
         return response
     
@@ -63,9 +58,11 @@ class S3Service:
     
     def deleteS3Bucket(self, flag):
         if flag=="Raw":
-            bucketName = self.s3BucketNameRawData
+            bucketName = self.s3RawData
+        elif flag =="Infer":
+            bucketName=self.s3InferData
         else:
-            bucketName=self.s3BucketNameInferData
+            bucketName=self.s3VideoData
             
         print(bucketName)  
         try:
@@ -83,9 +80,10 @@ class S3Service:
 if __name__ == '__main__':
 
     s3ServiceObj = S3Service()
-    resultRaw=s3ServiceObj.createS3Bucket("Raw")
-    print(resultRaw)
-    resultInfer=s3ServiceObj.createS3Bucket("Infer")
-    print(resultInfer)
-    # resultRaw = s3ServiceObj.deleteS3Bucket("Raw")
+    # resultRaw=s3ServiceObj.createS3Bucket("Raw")
+    # print(resultRaw)
+    resultVideo=s3ServiceObj.createS3Bucket("video")
+    print(resultVideo)
+    # resultRaw = s3ServiceObj.deleteS3Bucket("video")
+    # print(resultRaw)
     # resultInfer = s3ServiceObj.deleteS3Bucket("Infer")
